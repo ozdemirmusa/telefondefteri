@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+</h:head>
+<h:body>
+
+
+	<h:form id="form">
+		<p:growl id="mesaj" sticky="true" showDetail="true" life="3000" />
+		<p:dataTable var="liste" value="#{Bean.kisiListe}" editable="true">
+			<p:column headerText="KİŞİ BİLGİ">
+				<p:column>
+					<h:outputText value="#{liste.ad}" />
+					<br />
+					<h:outputText value="#{liste.soyad}" />
+					<br />
+					<h:outputText value="#{liste.mail}" />
+					<br />
+					<h:outputText value="#{liste.adres}" />
+					<br />
+				</p:column>
+				<p:column>
+					<p:row>
+						<p:commandButton id="kisiDuzenleBtn" update=":kisi:yeniKisi"
+							oncomplete="PF('yeniKisiKayit').show()" style="width:32px;"
+							icon="ui-icon-pencil" actionListener="#{Bean.degisim}">
+							<f:setPropertyActionListener value="#{liste}"
+								target="#{Bean.kisi}" style="width:32px" />
+						</p:commandButton>
+					</p:row>
+					<p:row>
+						<p:commandButton id="kisiSilBtn" process="@this liste"
+							action="#{Bean.kisiSil(liste.id)}" icon="ui-icon-trash "
+							title="Kisi Sil" ajax="false" style="width:32px">
+						</p:commandButton>
+					</p:row>
+					<p:row>
+						<p:commandButton id="kisiGosterBtn" update=":form:kisiDetay"
+							oncomplete="PF('kisiBilgi').show()" icon="ui-icon-search"
+							title="Kisi bilgi">
+							<f:setPropertyActionListener value="#{liste}"
+								target="#{Bean.kisi}" style="width:32px" />
+						</p:commandButton>
+					</p:row>
+				</p:column>
+			</p:column>
+			<p:column headerText="TELEFONLAR">
+				<p:repeat var="telefon" value="#{liste.telefons}">
+					<p:panelGrid columns="4" layout="grid">
+
+						<h:outputLabel value="#{telefon.tur}" />
+						<h:outputLabel value="#{telefon.numara}" />
+
+						<p:commandButton id="numaraDuzenle" update=":telefon:yeniTefon"
+							oncomplete="PF('yeniTelefonKayit').show()" style="width:32px;"
+							icon="ui-icon-pencil" actionListener="#{Bean.buttonAction}">
+							<f:setPropertyActionListener value="#{telefon}"
+								target="#{Bean.telefon}" />
+							<f:attribute value="#{liste.id}" name="Id" />
+						</p:commandButton>
+						<p:commandButton id="numaraSilBtn" style="width:32px;"
+							update=":form"
+							actionListener="#{Bean.telefonSil(liste.id,telefon.id)}"
+							ajax="false" styleClass="ui-priority-primary"
+							icon="ui-icon-trash">
+						</p:commandButton>
+
+					</p:panelGrid>
+				</p:repeat>
+				<p:commandButton actionListener="#{Bean.buttonAction}"
+					oncomplete="PF('yeniTelefonKayit').show();" icon="ui-icon-plus"
+					title="Yeni Telefon">
+					<f:attribute value="#{liste.id}" name="Id" />
+					<p:ajax update=":telefon:yeniTefon" resetValues="true" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+		<p:commandButton oncomplete="PF('yeniKisiKayit').show();"
+			icon="ui-icon-plus" title="Yeni Kişi">
+			<p:ajax update=":kisi:yeniKisi" resetValues="true" />
+		</p:commandButton>
+
+
+		<p:dialog id="kisikayitGoster" header="Kisi Bilgi"
+			widgetVar="kisiBilgi" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false">
+
+			<p:outputPanel id="kisiDetay" style="text-align:center;">
+				<h:form>
+					<p:panelGrid columns="2" rendered="#{not empty Bean.kisi}"
+						columnClasses="label,value">
+						<h:outputText value="Ad" />
+						<h:outputText value="#{Bean.kisi.ad}" />
+
+						<h:outputText value="Soyad" />
+						<h:outputText value="#{Bean.kisi.soyad}" />
+
+						<h:outputText value="E-mail" />
+						<h:outputText value="#{Bean.kisi.mail}" />
+
+						<h:outputText value="Adres" />
+						<h:outputText value="#{Bean.kisi.adres}" />
+					</p:panelGrid>
+				</h:form>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+
+	<h:form id="kisi">
+		<p:dialog id="yeniKisiDialog" header="Yeni Kişi"
+			widgetVar="yeniKisiKayit" resizable="false">
+			<p:outputPanel id="yeniKisi" style="text-align:center;">
+				<h:panelGrid columns="2" cellpadding="5"
+					rendered="#{not empty  Bean.kisi}">
+					<h:outputLabel value="#{Bean.kisi.id}" style="visibility:hidden;" />
+					<h:inputHidden value="#{Bean.kisi.id}" />
+					<h:outputLabel for="ad" value="Adınız:" />
+					<p:inputText id="ad" value="#{Bean.kisi.ad}" required="true"
+						label="ad">
+						<p:keyFilter regEx="/[a-zA-ZŞşçÇöÖüÜğĞİı]/i" />
+						</p:inputText>
+
+					<h:outputLabel for="soyad" value="Soyadınız:" />
+					<p:inputText id="soyad" value="#{Bean.kisi.soyad}" required="true"
+						label="soyad" >
+						<p:keyFilter regEx="/[a-zA-ZŞşçÇöÖüÜğĞİı]/i" />
+						</p:inputText>
+
+					<h:outputLabel for="mail" value="E-mail Adresiniz:" />
+					<p:inputText id="mail" value="#{Bean.kisi.mail}" required="true"
+						label="mail">
+						<f:validateRegex
+							pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+					</p:inputText>
+					<h:outputLabel for="adres" value="Adresiniz:" />
+					<p:inputTextarea id="adres" value="#{Bean.kisi.adres}"
+						required="true" label="adres" >
+						<p:keyFilter regEx="/[a-zA-ZŞşçÇöÖüÜğĞİı_:0-9\s\/]/i" />
+						</p:inputTextarea>
+					<f:facet name="footer">
+						<p:commandButton update=":form:mesaj" value="Kaydet"
+							action="#{Bean.kisiEkle()}"
+							style="visibility:#{Bean.gorunurlukk}">
+						</p:commandButton>
+					</f:facet>
+					<f:facet name="footer">
+						<p:commandButton id="duzenn" value="Düzenle" update=":form:mesaj"
+							action="#{Bean.kisiDuzenle()}"
+							style="visibility:#{Bean.gorunurluk}" />
+					</f:facet>
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+	<h:form id="telefon">
+		<p:dialog header="Yeni Telefon" widgetVar="yeniTelefonKayit"
+			resizable="false">
+			<p:outputPanel id="yeniTefon" style="text-align:center;">
+				<h:panelGrid columns="2" cellpadding="5"
+					rendered="#{not empty Bean.telefon}">
+					<h:outputLabel value="#{Bean.telefon.id}"
+						style="visibility:hidden;" />
+					<h:inputHidden value="#{Bean.telefon.id}" />
+					<h:outputLabel for="tur" value="Tür(ev-cep...):" />
+					<p:inputText id="tur" value="#{Bean.telefon.tur}" required="true"
+						requiredMessage="Lütfen Türünü Belirtiniz"
+						validatorMessage="Lütfen Harf Giriniz!!(abc(3-10))" label="ad">
+						<f:validateLength minimum="2" maximum="10" />
+						<p:keyFilter regEx="/[a-zA-ZŞşçÇöÖüÜğĞİı]/i" />
+					</p:inputText>
+					<h:outputLabel for="numara" value="Numaranız:" />
+					<p:inputMask mask="(999) 999-99-99" id="numara"
+						value="#{Bean.telefon.numara}" required="true"
+						requiredMessage="Telefon Numaranızı Giriniz" label="numara" />
+					<f:facet name="footer">
+						<p:commandButton value="Kaydet" update=":form:mesaj"
+							action="#{Bean.telefonEkle()}"
+							style="visibility:#{Bean.gorunurlukk}" />
+					</f:facet>
+					<f:facet name="footer">
+						<p:commandButton value="Düzenle" update=":form:mesaj"
+							action="#{Bean.telefonDuzenle()}"
+							style="visibility:#{Bean.gorunurluk}" />
+					</f:facet>
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+</h:body>
+</html>
