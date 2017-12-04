@@ -13,8 +13,8 @@ import javax.faces.event.ActionEvent;
 
 import org.primefaces.context.RequestContext;
 
-import dao.KisiDaoImpl;
-import dao.TelefonDaoImpl;
+import dao.KisiDao;
+import dao.TelefonDao;
 import model.Kisi;
 import model.Telefon;
 
@@ -24,9 +24,9 @@ public class AnaBean {
 	@ManagedProperty(value = "#{viev}")
 	private ViewBean viev;
 	@EJB
-	KisiDaoImpl kisiDaoImpl;
+	KisiDao kisiDaoImpl;
 	@EJB
-	TelefonDaoImpl telefonDaoImpl;
+	TelefonDao telefonDaoImpl;
 	private Kisi kisi = new Kisi();
 	private Telefon telefon = new Telefon();
 	private List<Kisi> kisiListe;
